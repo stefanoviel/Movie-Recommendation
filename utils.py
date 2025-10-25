@@ -18,8 +18,7 @@ def random_neq(l, r, s):
 def sample_function(user_train, usernum, itemnum, batch_size, maxlen, result_queue, SEED):
     def sample(uid):
 
-        # uid = np.random.randint(1, usernum + 1)
-        while len(user_train[uid]) <= 1: uid = np.random.randint(1, usernum + 1)
+        while user_train.get(uid) is None: uid = np.random.randint(1, usernum + 1) # make sure the user has items
 
         seq = np.zeros([maxlen], dtype=np.int32)
         pos = np.zeros([maxlen], dtype=np.int32)
@@ -86,9 +85,10 @@ def data_partition(fname):
     user_valid = {}
     user_test = {}
     # assume user/item index starting from 1
-    f = open('data/%s.txt' % fname, 'r')
-    for line in f:
-        u, i = line.rstrip().split(' ')
+    f = open('data/%s.csv' % fname, 'r')
+    for n, line in enumerate(f):
+        if n == 0: continue  # skip header
+        u, i = line.rstrip().split(',')
         u = int(u)
         i = int(i)
         usernum = max(u, usernum)
@@ -124,7 +124,8 @@ def evaluate(model, dataset, args):
         users = range(1, usernum + 1)
     for u in users:
 
-        if len(train[u]) < 1 or len(test[u]) < 1: continue
+        if train.get(u) is None or test.get(u) is None or valid.get(u) is None: continue
+        if len(test[u]) == 0 or len(valid[u]) == 0 or len(train[u]) < 1: continue
 
         seq = np.zeros([args.maxlen], dtype=np.int32)
         idx = args.maxlen - 1
@@ -171,7 +172,8 @@ def evaluate_valid(model, dataset, args):
     else:
         users = range(1, usernum + 1)
     for u in users:
-        if len(train[u]) < 1 or len(valid[u]) < 1: continue
+        if train.get(u) is None or test.get(u) is None or valid.get(u) is None: continue
+        if len(test[u]) == 0 or len(valid[u]) == 0 or len(train[u]) < 1: continue
 
         seq = np.zeros([args.maxlen], dtype=np.int32)
         idx = args.maxlen - 1
