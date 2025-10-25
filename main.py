@@ -31,18 +31,16 @@ parser.add_argument('--inference_only', default=False, type=str2bool)
 parser.add_argument('--state_dict_path', default=None, type=str)
 parser.add_argument('--norm_first', action='store_true', default=False)
 
-
-args = parser.parse_args()
-
-current_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-run_name = f"{args.dataset}_{args.train_dir}_{current_time}"
-RUN_FOLDER = os.path.join('results', run_name)
-
-if not os.path.isdir(RUN_FOLDER):
-    os.makedirs(RUN_FOLDER, exist_ok=True) 
-
-
 def main():
+
+    args = parser.parse_args()
+
+    current_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%')
+    run_name = f"{args.dataset}_{args.train_dir}_{current_time}"
+    RUN_FOLDER = os.path.join('results', run_name)
+
+    if not os.path.isdir(RUN_FOLDER):
+        os.makedirs(RUN_FOLDER, exist_ok=True) 
 
     writer = SummaryWriter(log_dir=os.path.join(RUN_FOLDER, 'tensorboard'))
 
