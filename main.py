@@ -2,6 +2,7 @@ import os
 import time
 import torch
 import argparse
+import datetime # <-- Added datetime for timestamping
 
 from model import SASRec
 from utils import *
@@ -32,15 +33,21 @@ parser.add_argument('--norm_first', action='store_true', default=False)
 
 
 args = parser.parse_args()
-if not os.path.isdir(args.dataset + '_' + args.train_dir):
-    os.makedirs(os.path.join(args.dataset + '_' + args.train_dir))
-with open(os.path.join(args.dataset + '_' + args.train_dir, 'args.txt'), 'w') as f:
+
+current_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+run_name = f"{args.dataset}_{args.train_dir}_{current_time}"
+RUN_FOLDER = os.path.join('results', run_name)
+
+if not os.path.isdir(RUN_FOLDER):
+    os.makedirs(RUN_FOLDER, exist_ok=True) 
+
+with open(os.path.join(RUN_FOLDER, 'args.txt'), 'w') as f:
     f.write('\n'.join([str(k) + ',' + str(v) for k, v in sorted(vars(args).items(), key=lambda x: x[0])]))
 f.close()
 
 def main():
 
-    writer = SummaryWriter(log_dir=os.path.join(args.dataset + '_' + args.train_dir, 'tensorboard'))
+    writer = SummaryWriter(log_dir=os.path.join(RUN_FOLDER, 'tensorboard'))
 
     # global dataset
     dataset = data_partition(args.dataset)
@@ -52,9 +59,6 @@ def main():
     for u in user_train:
         cc += len(user_train[u])
     print('average sequence length: %.2f' % (cc / len(user_train)))
-    
-    f = open(os.path.join(args.dataset + '_' + args.train_dir, 'log.txt'), 'w')
-    f.write('epoch (val_ndcg, val_hr) (test_ndcg, test_hr)\n')
     
     sampler = WarpSampler(user_train, usernum, itemnum, batch_size=args.batch_size, maxlen=args.maxlen, n_workers=3)
     model = SASRec(usernum, itemnum, args).to(args.device) # no ReLU activation in original SASRec implementation?
@@ -141,23 +145,21 @@ def main():
             best_val_hr = max(t_valid[1], best_val_hr)
             best_test_ndcg = max(t_test[0], best_test_ndcg)
             best_test_hr = max(t_test[1], best_test_hr)
-            folder = args.dataset + '_' + args.train_dir
+            
+            folder = RUN_FOLDER
             fname = 'SASRec.epoch={}.lr={}.layer={}.head={}.hidden={}.maxlen={}.pth'
             fname = fname.format(epoch, args.lr, args.num_blocks, args.num_heads, args.hidden_units, args.maxlen)
             torch.save(model.state_dict(), os.path.join(folder, fname))
 
-        f.write(str(epoch) + ' ' + str(t_valid) + ' ' + str(t_test) + '\n')
-        f.flush()
         t0 = time.time()
         model.train()
     
         if epoch == args.num_epochs:
-            folder = args.dataset + '_' + args.train_dir
+            folder = RUN_FOLDER
             fname = 'SASRec.epoch={}.lr={}.layer={}.head={}.hidden={}.maxlen={}.pth'
             fname = fname.format(args.num_epochs, args.lr, args.num_blocks, args.num_heads, args.hidden_units, args.maxlen)
             torch.save(model.state_dict(), os.path.join(folder, fname))
     
-    f.close()
     sampler.close()
     print("Done")
 
