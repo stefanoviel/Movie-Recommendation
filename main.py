@@ -17,7 +17,7 @@ def str2bool(s):
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', required=True)
 parser.add_argument('--train_dir', required=True)
-parser.add_argument('--batch_size', default=128, type=int) # TODO: set to 128 or 256 for real training
+parser.add_argument('--batch_size', default=128, type=int) 
 parser.add_argument('--lr', default=0.001, type=float)
 parser.add_argument('--maxlen', default=200, type=int)
 parser.add_argument('--hidden_units', default=50, type=int)
@@ -41,9 +41,6 @@ RUN_FOLDER = os.path.join('results', run_name)
 if not os.path.isdir(RUN_FOLDER):
     os.makedirs(RUN_FOLDER, exist_ok=True) 
 
-with open(os.path.join(RUN_FOLDER, 'args.txt'), 'w') as f:
-    f.write('\n'.join([str(k) + ',' + str(v) for k, v in sorted(vars(args).items(), key=lambda x: x[0])]))
-f.close()
 
 def main():
 
@@ -52,8 +49,13 @@ def main():
     # global dataset
     dataset = data_partition(args.dataset)
 
-    [user_train, user_valid, user_test, usernum, itemnum] = dataset
-    # num_batch = len(user_train) // args.batch_size # tail? + ((len(user_train) % args.batch_size) != 0)
+    [user_train, user_valid, user_test, usernum, itemnum] = dataset 
+
+    with open(os.path.join(RUN_FOLDER, 'args.txt'), 'w') as f:
+        f.write('\n'.join([str(k) + ',' + str(v) for k, v in sorted(vars(args).items(), key=lambda x: x[0])]))
+        f.write('\nusernum,' + str(usernum) + '\n')
+        f.write('itemnum,' + str(itemnum) + '\n')
+
     num_batch = (len(user_train) - 1) // args.batch_size + 1
     cc = 0.0
     for u in user_train:
