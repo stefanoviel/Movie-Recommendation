@@ -35,7 +35,7 @@ def main():
 
     args = parser.parse_args()
 
-    current_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%')
+    current_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     run_name = f"{args.dataset}_{args.train_dir}_{current_time}"
     RUN_FOLDER = os.path.join('results', run_name)
 
