@@ -159,7 +159,7 @@ with gr.Blocks() as demo:
     )
 
     gr.Markdown("---")
-    gr.Markdown("## Your Watch History (Min. 5 required)")
+    gr.Markdown("## Your Watch History")
     
     output_history = gr.Markdown(
         label="Selected Movies", 
