@@ -1,4 +1,6 @@
 data/*
+!data/movies_cleaned.csv
+!data/ratings_cleaned.csv
 .venv/
 __pycache__/
 results/*
