@@ -1,14 +1,13 @@
 ---
-title: Movie Recommender
-emoji: 🎥
-colorFrom: blue
+title: My Demo Space
+emoji: 🚀
+colorFrom: yellow
 colorTo: purple
 sdk: gradio
-sdk_version: "4.36.1"
+sdk_version: "4.42.0"
 app_file: app.py
 pinned: false
 ---
 
-# My Awesome App 🚀
-
-This [repository](https://github.com/pmixer/SASRec.pytorch) was used a starting point.
+# My Demo Space
+This space runs a Gradio app.
