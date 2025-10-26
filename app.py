@@ -108,7 +108,7 @@ def predict_top_movies(user_sequence):
         predictions = model.predict(seq.reshape(1, -1), torch.arange(args.itemnum))
 
     scores = predictions.squeeze(0).cpu().numpy()  # (itemnum,)
-    top_items = np.argsort(-scores)[:10]    
+    top_items = np.argsort(-scores)[:5]    
 
     recommended_titles = [ID_TO_TITLE.get(item_id, f"ID {item_id} (Not Found)") for item_id in top_items]
     
@@ -116,7 +116,7 @@ def predict_top_movies(user_sequence):
         [f"{i+1}. **{title}**" for i, title in enumerate(recommended_titles)]
     )
     
-    result_str = "## 🎉 Top 10 Recommended Movies:\n\n" + markdown_list
+    result_str = "## 🎉 Top 5 Recommended Movies:\n\n" + markdown_list
     
     return result_str
 
@@ -166,7 +166,7 @@ with gr.Blocks() as demo:
         value="No movies selected yet.", 
     )
 
-    submit_btn = gr.Button("Get Top 10 Recommendations", visible=False, variant="primary")
+    submit_btn = gr.Button("Get Top 5 Recommendations", visible=False, variant="primary")
 
     gr.Markdown("---")
     
