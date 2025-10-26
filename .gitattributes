@@ -1,0 +1,1 @@
+data_model/SASRec.epoch=30.lr=0.001.layer=2.head=1.hidden=50.maxlen=200.pth filter=lfs diff=lfs merge=lfs -text
